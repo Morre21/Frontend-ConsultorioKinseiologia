@@ -70,7 +70,26 @@ const PacienteDashboard: React.FC = () => {
     obtenerDatosPaciente();
   }, [navigate]);
 
+  const eliminarTurno = async (turnoId: number) => {
+    const confirmar = window.confirm("¿Estás seguro de que deseas cancelar este turno?");
+    if (confirmar) {
+      try {
+        const response = await fetch(`/api/turnos/${turnoId}`, { // Usa comillas invertidas `` en la URL
+          method: 'DELETE',
+          credentials: 'include',
+        });
+        if (!response.ok) {
+          throw new Error('Error al cancelar el turno');
+        }
+        setTurnosPendientes(prevTurnos => prevTurnos.filter(turno => turno.id !== turnoId));
+      } catch (error) {
+        console.error('Error al cancelar el turno:', error);
+      }
+    }
+  };
+
   return (
+    <body className='dash-paciente'>
     <div className="dashboard">
       <div className="container pt-4 pb-4">
         {/* Header */}
@@ -106,10 +125,10 @@ const PacienteDashboard: React.FC = () => {
               </div>
 
               <div className="appointment-actions">
-                <button className="btn btn-link text-primary p-1">
-                  <i className="bi bi-pencil-square"></i>
-                </button>
-                <button className="btn btn-link text-danger p-1">
+                <button
+                  className="btn btn-link text-danger p-1"
+                  onClick={() => eliminarTurno(turno.id)}
+                >
                   <i className="bi bi-trash"></i>
                 </button>
               </div>
@@ -155,6 +174,7 @@ const PacienteDashboard: React.FC = () => {
         </div>
       </div>
     </div>
+    </body>
   );
 };
 

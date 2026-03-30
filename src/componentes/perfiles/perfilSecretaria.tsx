@@ -4,26 +4,31 @@ import '../../estilos/perfiles.css';
 import { Button, Form, Row, Col, Container } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-interface Paciente {
+interface Secretaria {
   id: number;
   nombre: string;
   apellido: string;
   dni: number;
   email: string;
   telefono: number;
-  obraSocial: string;
+  consultorio: Consultorio;
 }
 
-const DatosPaciente: React.FC = () => {
-  const [paciente, setPaciente] = useState<Paciente | null>(null);
-  const [editedData, setEditedData] = useState<Paciente | null>(null);
+interface Consultorio{  
+  id: number;
+  nombre: string;
+}
+
+const DatosSecretaria: React.FC = () => {
+  const [secretaria, setSecretaria] = useState<Secretaria | null>(null);
+  const [editedData, setEditedData] = useState<Secretaria | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const obtenerDatosPaciente = async () => {
+    const obtenerDatosSecretaria = async () => {
       try {
-        const response = await fetch(`/api/pacientes/k/${paciente?.id}`, {
+        const response = await fetch(`/api/secretarias/k/${secretaria?.id}`, {
           method: 'GET',
           credentials: 'include',
         });
@@ -31,15 +36,16 @@ const DatosPaciente: React.FC = () => {
           throw new Error('Error en la respuesta de la API');
         }
         const data = await response.json();
-        setPaciente(data.data);
+        console.log('Datos recibidos:', data);
+        setSecretaria(data.data);
         setEditedData(data.data);
       } catch (error) {
-        console.error('Error al obtener los datos del paciente:', error);
+        console.error('Error al obtener los datos de la secretaria:', error);
         navigate('/');
       }
     };
 
-    obtenerDatosPaciente();
+    obtenerDatosSecretaria();
   }, [navigate]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -57,12 +63,12 @@ const DatosPaciente: React.FC = () => {
   };
 
   const handleCancel = () => {
-    setEditedData(paciente);
+    setEditedData(secretaria); // Resetea a los datos originales
     setIsEditing(false);
   };
 
   const handleSave = async () => {
-    if (!paciente) return;
+    if (!secretaria) return;
 
     const dataToUpdate = {
       nombre: editedData?.nombre,
@@ -70,11 +76,10 @@ const DatosPaciente: React.FC = () => {
       dni: editedData?.dni,
       email: editedData?.email,
       telefono: editedData?.telefono,
-      direccion: editedData?.obraSocial,
     };
 
     try {
-      const response = await fetch(`/api/pacientes/k/${paciente.id}`, {
+      const response = await fetch(`/api/secretarias/k/${secretaria.id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -83,22 +88,23 @@ const DatosPaciente: React.FC = () => {
         body: JSON.stringify(dataToUpdate),
       });
       if (!response.ok) {
-        throw new Error('Error al actualizar los datos del paciente');
+        throw new Error('Error al actualizar los datos de la secretaria');
       }
 
       const updatedData = await response.json();
-      setPaciente(updatedData.data);
+      setSecretaria(updatedData.data);
       setIsEditing(false);
     } catch (error) {
-      console.error('Error al guardar los datos del paciente:', error);
+      console.error('Error al guardar los datos de la secretaria:', error);
+      console.log('Datos a guardar:', dataToUpdate);
     }
   };
 
   return (
-    <body className='perfil-paciente'>
-    <Container className="datos-paciente-container">
+    <body className='perfil-secretaria'>
+    <Container className="datos-secretaria-container">
       <h2>Mis datos</h2>
-      {paciente && (
+      {secretaria && (
         <Form className="formulario">
           <Form.Group as={Row} className="mb-3">
             <Form.Label column sm="3">Nombre:</Form.Label>
@@ -166,15 +172,14 @@ const DatosPaciente: React.FC = () => {
             </Col>
           </Form.Group>
           <Form.Group as={Row} className="mb-3">
-            <Form.Label column sm="3">Obra Social:</Form.Label>
+            <Form.Label column sm="3">Consultorio:</Form.Label>
             <Col sm="9">
               <Form.Control
                 type="text"
-                name="direccion"
+                name="especialidad"
                 className="formularioC"
-                value={editedData?.obraSocial || ''}
-                onChange={handleInputChange}
-                disabled={!isEditing}
+                value={editedData?.consultorio?.nombre || ''}
+                disabled
               />
             </Col>
           </Form.Group>
@@ -201,4 +206,4 @@ const DatosPaciente: React.FC = () => {
   );
 };
 
-export default DatosPaciente;
+export default DatosSecretaria;

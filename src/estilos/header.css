@@ -48,7 +48,8 @@
 
 /* Espaciador dinámico para compensar el header */
 .header-spacer {
-  height: 80px; /* Altura fija para compensar el header */
+  height: 80px;
+  /* Altura fija para compensar el header */
 }
 
 /* Estilos para pantallas pequeñas */
@@ -75,7 +76,8 @@
   }
 
   .header-spacer {
-    height: 100px; /* Ajuste dinámico para pantallas más pequeñas */
+    height: 100px;
+    /* Ajuste dinámico para pantallas más pequeñas */
   }
 }
 
